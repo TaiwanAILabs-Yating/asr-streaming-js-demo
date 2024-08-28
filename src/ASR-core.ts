@@ -201,7 +201,6 @@ class AudioController {
   private recordingLength: number = 0;
 
   private sampleRate: number = 16000;
-  private audioType: string = "audio/wave";
   private pause: boolean = false;
   private isAudioIn: boolean = false;
 
