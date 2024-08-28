@@ -2,7 +2,7 @@
 
 This repository provide the simplest use case of our [Studio ASR API](https://developer.yating.tw/)
 
-You can visit the live demo website to see the working example.
+You can visit the [live demo website](https://taiwanailabs-yating.github.io/asr-streaming-js-demo/) to see the working example.
 
 ## How to start the demo site
 
