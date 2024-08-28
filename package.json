@@ -1,9 +1,9 @@
 {
-  "name": "basic-react",
+  "name": "asr-streaming-js-demo",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "author": "hikariNTU",
+  "author": "AILabs",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -21,22 +21,19 @@
     "@typescript-eslint/parser": "^7.0.2",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.17",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
     "postcss": "^8.4.35",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "tailwindcss": "^3.4.1",
-    "eslint": "^8.56.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.5",
     "typescript": "^5.4.2",
     "vite": "^5.1.4"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hikariNTU/basic-react"
-  },
-  "bugs": {
-    "url": "https://github.com/hikariNTU/basic-react/issues"
+    "url": "https://github.com/hikariNTU/asr-streaming-js-demo"
   }
 }
