@@ -3,7 +3,7 @@ import {
   ASRCoreState,
   getAuthToken,
   SentencesContent,
-} from "./ASR-core";
+} from "../ASR-core";
 
 import { useEffect, useState } from "react";
 
