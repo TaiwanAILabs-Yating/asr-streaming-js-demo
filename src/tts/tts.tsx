@@ -1,12 +1,15 @@
+import "@/src/index.css";
+import axios from "axios";
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
-import "@/src/index.css";
 
 function TTSDemo() {
   const host = "https://tts.api.yating.tw";
   const url = "/v3/speeches/synchronize";
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const [responseData, setResponseData] = useState<string | null>(null);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const apiKey = formData.get("apiKey") as string;
@@ -26,6 +29,19 @@ function TTSDemo() {
         uploadFile: true,
       },
     };
+    console.log(requestBody);
+
+    try {
+      const response = await axios.post(host + url, requestBody, {
+        headers: {
+          "Content-Type": "application/json",
+          key: apiKey,
+        },
+      });
+      setResponseData(response.data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -35,22 +51,23 @@ function TTSDemo() {
         onSubmit={handleSubmit}
         className="flex flex-col items-start gap-4 p-4"
       >
-        <label className="flex flex-col items-start">
+        <label className="flex w-full flex-col items-start">
           API Key
           <input
             type="text"
             name="apiKey"
-            className="rounded-xl border px-4 py-2"
+            className="w-full rounded-xl border px-4 py-2"
             placeholder="Enter the api key here"
           />
         </label>
-        <label className="flex flex-col items-start">
+        <label className="flex w-full flex-col items-start">
           Input Text
-          <input
-            type="text"
+          <textarea
             name="inputText"
-            className="rounded-xl border px-4 py-2"
+            className="w-full rounded-xl border px-4 py-2"
             placeholder="Enter the text here"
+            maxLength={600}
+            rows={4}
           />
         </label>
         <label className="flex flex-col items-start">
@@ -91,6 +108,10 @@ function TTSDemo() {
           提交
         </button>
       </form>
+      <p>Response Data</p>
+      <pre className="overflow-auto whitespace-pre-wrap rounded-xl border bg-neutral-50 p-4">
+        {JSON.stringify(responseData, null, 2)}
+      </pre>
     </div>
   );
 }
