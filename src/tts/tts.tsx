@@ -1,5 +1,4 @@
 import "@/src/index.css";
-import axios from "axios";
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 
@@ -32,13 +31,21 @@ function TTSDemo() {
     console.log(requestBody);
 
     try {
-      const response = await axios.post(host + url, requestBody, {
+      const response = await fetch(host + url, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           key: apiKey,
         },
+        body: JSON.stringify(requestBody),
       });
-      setResponseData(response.data);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setResponseData(data);
     } catch (error) {
       console.error(error);
     }
