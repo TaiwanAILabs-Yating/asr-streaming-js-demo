@@ -1,11 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import "@/src/index.css";
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
+import { ttsApi, ttsRequestBodyType } from "./tts-lib";
 
 function TTSDemo() {
-  const host = "https://tts.api.yating.tw";
-  const url = "/v3/speeches/synchronize";
-
   const [responseData, setResponseData] = useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -13,14 +12,14 @@ function TTSDemo() {
     const formData = new FormData(event.currentTarget);
     const apiKey = formData.get("apiKey") as string;
 
-    const requestBody = {
+    const requestBody: ttsRequestBodyType = {
       input: {
         text: formData.get("inputText") as string,
         type: "text",
       },
       voice: {
-        model: formData.get("model") as string,
-        lang: formData.get("language") as string,
+        model: formData.get("model") as any,
+        lang: formData.get("language") as any,
       },
       audioConfig: {
         encoding: "LINEAR16",
@@ -31,23 +30,11 @@ function TTSDemo() {
     console.log(requestBody);
 
     try {
-      const response = await fetch(host + url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          key: apiKey,
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await ttsApi(apiKey, requestBody);
       setResponseData(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      setResponseData(JSON.stringify(error.message, null, 2));
     }
   };
 
