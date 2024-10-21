@@ -30,11 +30,18 @@ export type ttsRequestBodyType = {
     uploadFile: boolean;
   };
 };
-export async function ttsApi(apiKey: string, requestBody: ttsRequestBodyType) {
-  const host = "https://tts.api.yating.tw";
-  const url = "/v3/speeches/synchronize";
-
-  const response = await fetch(host + url, {
+export async function ttsApi(
+  requestBody: ttsRequestBodyType,
+  {
+    endpoint = "https://tts.api.yating.tw/v3/speeches/synchronize",
+    apiKey,
+  }: {
+    endpoint?: string;
+    apiKey: string;
+  },
+) {
+  const now = Date.now();
+  const response = await fetch(endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -42,6 +49,7 @@ export async function ttsApi(apiKey: string, requestBody: ttsRequestBodyType) {
     },
     body: JSON.stringify(requestBody),
   });
+  console.log(`Spent: ${Date.now() - now} ms`);
 
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);

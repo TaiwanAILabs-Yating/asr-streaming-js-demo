@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import "@/src/index.css";
 import React, { useState } from "react";
-import ReactDOM from "react-dom/client";
 import { ttsApi, ttsRequestBodyType } from "./tts-lib";
 
-function TTSDemo() {
+export function TTSDemo() {
   const [responseData, setResponseData] = useState<string | null>(null);
+  const [prevTime, setPrevTime] = useState(0);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const apiKey = formData.get("apiKey") as string;
 
     const requestBody: ttsRequestBodyType = {
       input: {
@@ -29,13 +28,18 @@ function TTSDemo() {
     };
     console.log(requestBody);
 
+    const prev = Date.now();
     try {
-      const data = await ttsApi(apiKey, requestBody);
+      const data = await ttsApi(requestBody, {
+        apiKey: formData.get("apiKey") as string,
+        endpoint: formData.get("endpoint") as string,
+      });
       setResponseData(data);
     } catch (error: any) {
       console.error(error);
       setResponseData(JSON.stringify(error.message, null, 2));
     }
+    setPrevTime(Date.now() - prev);
   };
 
   return (
@@ -45,6 +49,16 @@ function TTSDemo() {
         onSubmit={handleSubmit}
         className="flex flex-col items-start gap-4 p-4"
       >
+        <label className="flex w-full flex-col items-start">
+          Endpoint
+          <input
+            type="text"
+            name="endpoint"
+            className="w-full rounded-xl border px-4 py-2"
+            placeholder="Endpoint"
+            defaultValue="https://tts.api.yating.tw/v3/speeches/synchronize"
+          />
+        </label>
         <label className="flex w-full flex-col items-start">
           API Key
           <input
@@ -106,16 +120,7 @@ function TTSDemo() {
       <pre className="overflow-auto whitespace-pre-wrap rounded-xl border bg-neutral-50 p-4">
         {JSON.stringify(responseData, null, 2)}
       </pre>
+      Elapsed: {prevTime} ms.
     </div>
-  );
-}
-
-const root = document.getElementById("root");
-
-if (root) {
-  ReactDOM.createRoot(root).render(
-    <React.StrictMode>
-      <TTSDemo />
-    </React.StrictMode>,
   );
 }
