@@ -35,6 +35,13 @@ export function TTSDemo() {
         endpoint: formData.get("endpoint") as string,
       });
       setResponseData(data);
+      try {
+        if (data?.audioFile?.audioContent) {
+          play(data.audioFile.audioContent, data.audioEncoding);
+        }
+      } catch (_) {
+        //ignore playback error
+      }
     } catch (error: any) {
       console.error(error);
       setResponseData(JSON.stringify(error.message, null, 2));
@@ -123,4 +130,12 @@ export function TTSDemo() {
       Elapsed: {prevTime} ms.
     </div>
   );
+}
+
+function play(b64: string, type: string) {
+  const a = new Audio(`data:audio/${type};base64, ${b64}`);
+  a.play();
+  a.onended = () => {
+    a.remove();
+  };
 }
