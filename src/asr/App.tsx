@@ -1,6 +1,7 @@
 import {
   ASRCore,
   ASRCoreState,
+  defaultEndpoints,
   getAuthToken,
   SentencesContent,
 } from "../ASR-core";
@@ -14,13 +15,17 @@ interface Device {
 }
 
 export default function VoiceChatContent() {
+  const [wsEndpoint, setWsEndpoint] = useState(defaultEndpoints.ws);
+  const [keyEndpoint, setKeyEndpoint] = useState(defaultEndpoints.token);
   const [apiKey, setApiKey] = useState("");
   const [content, setContent] = useState<SentencesContent>({
     finals: [],
     currentSentence: "",
   });
   const [state, setState] = useState<ASRCoreState>({ connected: false });
-  const [asrCore] = useState(() => new ASRCore(setContent, setState));
+  const [asrCore, setAsrCode] = useState(
+    new ASRCore(wsEndpoint, setContent, setState),
+  );
   const [devices, setDevices] = useState<Device[]>([]);
   const [deviceId, setDeviceId] = useState("default");
 
@@ -34,10 +39,37 @@ export default function VoiceChatContent() {
     });
   }, [asrCore]);
 
+  useEffect(() => {
+    setAsrCode((old) => {
+      old.stop();
+      return new ASRCore(wsEndpoint, setContent, setState);
+    });
+  }, [wsEndpoint]);
+
   return (
     <>
       <div className="flex w-full items-center gap-5 p-4">
         <div className="flex min-w-0 flex-1 flex-col items-start justify-start gap-2">
+          <label className="flex flex-col items-start">
+            WS Endpoint
+            <input
+              type="text"
+              className="rounded-xl border px-4 py-2"
+              value={wsEndpoint}
+              onChange={(e) => setWsEndpoint(e.currentTarget.value)}
+              placeholder="The web socket host"
+            />
+          </label>
+          <label className="flex flex-col items-start">
+            Key Endpoint
+            <input
+              type="text"
+              className="rounded-xl border px-4 py-2"
+              value={keyEndpoint}
+              onChange={(e) => setKeyEndpoint(e.currentTarget.value)}
+              placeholder="The token exchange endpoint"
+            />
+          </label>
           <label className="flex flex-col items-start">
             API Key
             <input
@@ -75,7 +107,7 @@ export default function VoiceChatContent() {
               className="rounded-full bg-neutral-100 px-4 py-2 hover:bg-neutral-200 active:bg-neutral-300 disabled:bg-transparent disabled:text-neutral-500"
               onClick={async () => {
                 try {
-                  const authToken = await getAuthToken(apiKey);
+                  const authToken = await getAuthToken(keyEndpoint, apiKey);
                   await asrCore.start({
                     deviceId,
                     authToken,

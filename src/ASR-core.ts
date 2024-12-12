@@ -1,7 +1,7 @@
 // @ts-check
 import type { Device } from "./type";
 
-const endpoints = {
+export const defaultEndpoints = {
   ws: "wss://asr.api.yating.tw/ws/v1",
   /** Token exchange endpoint */
   token: "https://asr.api.yating.tw/v1/token",
@@ -9,12 +9,17 @@ const endpoints = {
 
 /**
  * Get ASR Pipeline auth token with given pipeline language
+ * @param endpoint the key exchange endpoint
  * @param apiKey The key provided in dev-console, should be kept secretly without exposing to public
  * @param pipeline https://developer.yating.tw/zh-TW/doc/asr-ASR%20%E5%8D%B3%E6%99%82%E8%AA%9E%E9%9F%B3%E8%BD%89%E6%96%87%E5%AD%97#%E5%8F%96%E5%BE%97%E4%B8%80%E6%AC%A1%E6%80%A7%E5%AF%86%E7%A2%BC
  * @returns Auth token, attach this key to ws endpoint to connect to websocket
  */
-export async function getAuthToken(apiKey: string, pipeline = "asr-zh-en-std") {
-  const res = await fetch(endpoints.token, {
+export async function getAuthToken(
+  endpoint: string,
+  apiKey: string,
+  pipeline = "asr-zh-en-std",
+) {
+  const res = await fetch(endpoint, {
     method: "POST",
     headers: {
       key: apiKey,
@@ -46,7 +51,7 @@ export type ASRCoreState = {
  * Logic for ASR behavior
  */
 export class ASRCore {
-  private wsEndpoint: string = endpoints.ws;
+  private wsEndpoint: string = defaultEndpoints.ws;
   private socket: WebSocket | undefined;
   private onContentUpdate: (content: SentencesContent) => void;
   private onStateUpdate: (state: ASRCoreState) => void;
@@ -56,9 +61,11 @@ export class ASRCore {
   public state: ASRCoreState;
 
   constructor(
+    endpoint: string,
     onContentUpdate?: typeof this.onContentUpdate,
     onStateUpdate?: typeof this.onStateUpdate,
   ) {
+    this.wsEndpoint = endpoint;
     this.audioController = new AudioController((data, volume) => {
       this.setVisualScale(volume);
       if (this.socket && this.socket.readyState === this.socket.OPEN) {
